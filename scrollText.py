@@ -371,18 +371,14 @@ def getChars(text, x, y):
 	#print "len: " + str(length)
 	for i in range(0, length):
 		try:
-			if (x or y) < 0:
-				pass
-			if (x or y) > 9:
-				pass
-			else:
+			if (-10 <= x <= 9):
 				charsPos.extend(getChar(text[i],x,y))
 				chars.append(text[i])
 		except:
 			pass
 		x = x + 10
-	#print charsPos
-	#print chars
+		#print ch4arsPos
+		print chars
 	return charsPos
 
 
@@ -406,23 +402,24 @@ def setMatrix(parts):
 			pass
 
 
-def play():
-	
-	x = 10
+def play(Input,x,y):
+	text = Input
 	length = len(text)
 
 	for i in range(0, length*10+10):
-		setMatrix(getChars(text,x,0))
+		pixels = getChars(text,x,0)
+		setMatrix(pixels)
 		display()
 		x = x -1
-		time.sleep(0.1)
+
+		time.sleep(0.025)
 		clear()
 	
 
 
-text = raw_input("Text to display: ").upper()
+Input = raw_input("Text to display: ").upper()
 while True:
 	clear()
-	play()
+	play(Input,10,0)
 			
-
+#abcdefghijklmnopqrstuvwxyz 1234567890.,:;-_+"@*#%&/()=?'^!$<>[]
