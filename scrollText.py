@@ -4,6 +4,9 @@ import array
 import fcntl
 import sys
 import math
+import select
+from ast import literal_eval
+
 # 
 # Open SPI device
 spidev = file("/dev/spidev0.0", "wb")
@@ -378,9 +381,56 @@ def getChars(text, x, y):
 			pass
 		x = x + 10
 		#print ch4arsPos
-		print chars
+		#print chars
 	return charsPos
 
+
+
+global speed
+global color
+standardSpeed = 0.025
+speed = standardSpeed
+standardColor = [255,0,0]
+color = standardColor
+
+def setSpeed(newSpeed):
+	global speed
+	if 1 >= newSpeed >= 0:
+		speed = newSpeed
+	print speed
+
+def getSpeed():
+	if (standardSpeed == speed) == False:
+		#print "returned new Speed"
+		return speed
+	else:
+		#print "returned standardSpeed"
+		return standardSpeed
+
+def setColor(newColor):
+	global color
+	color = newColor
+	print color
+
+def getColor(index):
+	if(standardColor == color) == False:
+		return int(color[index])
+	else:
+		return int(standardColor[index])
+
+def checkInput():
+#falls stdin vorhanden wird es auf input gespeichert
+	if select.select([sys.stdin], [], [], 0)[0]:
+		Input = sys.stdin.readline().strip().upper()
+		
+		if Input[0:7] == "*SPEED*":
+			setSpeed(float(Input[7:len(Input)]))
+		elif Input[0:7] == "*COLOR*":
+			rgb = literal_eval(Input[7:len(Input)])
+			setColor(rgb)
+		else:			
+			print Input
+			play(Input.upper())
 
 def setMatrix(parts):
 	
@@ -393,33 +443,50 @@ def setMatrix(parts):
 				#print "negative"
 				pass
 			else:
-				matrix[a][b][0] = 255
-				matrix[a][b][1] = 0
-				matrix[a][b][2] = 0
+				matrix[a][b][0] = getColor(0)
+				matrix[a][b][1] = getColor(1)
+				matrix[a][b][2] = getColor(2)
 				#print("part %i done" % i)
 		except:
 			#print "not on matrix!"
 			pass
 
 
-def play(Input,x,y):
+
+def main(Input,x,y):
+	
 	text = Input
 	length = len(text)
 
 	for i in range(0, length*10+10):
+		checkInput()
 		pixels = getChars(text,x,0)
 		setMatrix(pixels)
 		display()
 		x = x -1
-
-		time.sleep(0.025)
+		#print speed
+		time.sleep(getSpeed())
 		clear()
 	
 
 
-Input = raw_input("Text to display: ").upper()
-while True:
-	clear()
-	play(Input,10,0)
+
+global speed
+standardSpeed = 0.025
+speed = standardSpeed
+#Input = raw_input("Text to display: ").upper()
+if len(sys.argv) < 2:
+	Input = "HELLO"
+else:
+	Input = sys.argv[1].upper()
+
+def play(Input):
+	while True:
+		clear()
+		checkInput()
+		main(Input,10,0)
+
+print("Scrolling Text Initiated")
+play(str(Input))
 			
 #abcdefghijklmnopqrstuvwxyz 1234567890.,:;-_+"@*#%&/()=?'^!$<>[]
