@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#coding: utf8 
 import time
 import array
 import fcntl
@@ -388,10 +389,7 @@ def getChars(text, x, y):
 
 global speed
 global color
-standardSpeed = 0.025
-speed = standardSpeed
-standardColor = [255,0,0]
-color = standardColor
+
 
 def setSpeed(newSpeed):
 	global speed
@@ -471,20 +469,43 @@ def main(Input,x,y):
 
 
 
-global speed
 standardSpeed = 0.025
 speed = standardSpeed
+standardColor = [255,0,0]
+color = standardColor
+passes = 0
 #Input = raw_input("Text to display: ").upper()
+
+"""
+Commandline Argument input:
+argv[1] = Text
+argv[2] = speed
+argv[3] = color
+argv[4] = # Passes (0 = infinite)
+
+"""
 if len(sys.argv) < 2:
 	Input = "HELLO"
 else:
-	Input = sys.argv[1].upper()
+	try:
+		Input = sys.argv[1].upper()
+		setSpeed(float(sys.argv[2]))
+		setColor(literal_eval(sys.argv[3]))
+		passes = int(sys.argv[4])
+	except:
+		print "Failed to use arguments"
 
 def play(Input):
-	while True:
-		clear()
-		checkInput()
-		main(Input,10,0)
+	if passes == 0:
+		while True:
+			clear()
+			checkInput()
+			main(Input,10,0)
+	else:
+		for i in range(0, passes):
+			clear()
+			checkInput()
+			main(Input,10,0)
 
 print("Scrolling Text Initiated")
 play(str(Input))
